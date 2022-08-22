@@ -65,9 +65,12 @@ async def root():
 
 
 @app.post("/content")
-def content(postid: int = Form()):
+def content(postid: str = Form()):
     dataset = data()
-    id = postid
+    dataset2 = data2()
+
+    house_list = list(dataset['postid'])
+    id = house_list.index(postid)
 
     def get_important_columns(data):
         important_columns = []
@@ -101,22 +104,39 @@ def content(postid: int = Form()):
             break
     results = list(df['postid'])
 
+    # using collaborative filtering to provide an extra 5 recommendations
+    train_data, test_data = train_test_split(dataset2, test_size=0.2, random_state=1)
+    model = Content.house_recommender()
+    model.create(train_data, 'userid', 'postid')
+
+    similar = model.similar_items([postid])
+    similar_list = list(similar['house_id'])
+
+    results.extend(similar_list)
+    results = list(dict.fromkeys(results))
+
     return {"postlist": results}
 
 
 @app.post("/collaborative")
-def collaborative(userid: int = Form()):
+def collaborative(userid: str = Form()):
     history = data2()
     users = history['userid'].unique()
+    user_list = users.tolist()
     train_data, test_data = train_test_split(history, test_size=0.2, random_state=1)
     model = Recommender.house_recommender()
     model.create(train_data, 'userid', 'postid')
 
-    user_id = users[userid]
+    error = "not available"
+    if userid not in user_list:
+        return error
+    else:
+        position = user_list.index(userid)
+    user_id = users[position]
     user_results = model.recommend(user_id)
     user_results_list = list(user_results['house_id'])
 
-    return {"userposts": user_results_list}
+    return {"postlist": user_results_list}
 
 
 if __name__ == '__main__':
