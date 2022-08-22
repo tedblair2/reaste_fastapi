@@ -129,7 +129,7 @@ def collaborative(userid: str = Form()):
 
     error = "not available"
     if userid not in user_list:
-        return error
+        return {"error": error}
     else:
         position = user_list.index(userid)
     user_id = users[position]
