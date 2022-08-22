@@ -127,9 +127,9 @@ def collaborative(userid: str = Form()):
     model = Recommender.house_recommender()
     model.create(train_data, 'userid', 'postid')
 
-    error = "not available"
+    error = "nothing"
     if userid not in user_list:
-        return {"error": error}
+        return {"postlist": [error]}
     else:
         position = user_list.index(userid)
     user_id = users[position]
