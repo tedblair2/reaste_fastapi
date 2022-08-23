@@ -7,6 +7,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer
 from fastapi import FastAPI, Form
 import uvicorn
+import random
 
 app = FastAPI()
 
@@ -122,14 +123,15 @@ def content(postid: str = Form()):
 def collaborative(userid: str = Form()):
     history = data2()
     users = history['userid'].unique()
+    houses= history['postid'].unique().tolist()
     user_list = users.tolist()
     train_data, test_data = train_test_split(history, test_size=0.2, random_state=1)
     model = Recommender.house_recommender()
     model.create(train_data, 'userid', 'postid')
 
-    error = "nothing"
     if userid not in user_list:
-        return {"postlist": [error]}
+        houses_list = random.sample(houses, 10)
+        return {"postlist": houses_list}
     else:
         position = user_list.index(userid)
     user_id = users[position]
