@@ -82,12 +82,12 @@ class house_recommender():
 
         rank = 1
         for i in range(0, len(sort_index)):
-            if ~numpy.isnan(sort_index[i][0]) and all_houses[sort_index[i][1]] not in user_houses and rank <= 15:
+            if ~numpy.isnan(sort_index[i][0]) and all_houses[sort_index[i][1]] not in user_houses and rank <= 10:
                 df.loc[len(df)] = [user, all_houses[sort_index[i][1]], sort_index[i][0], rank]
                 rank = rank + 1
 
         if df.shape[0] == 0:
-            print("The current user has no history for training the item similarity based recommendation model.")
+            print("None")
             return -1
         else:
             return df
