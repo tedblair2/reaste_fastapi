@@ -2,15 +2,13 @@ import pandas
 import numpy
 
 
-class house_recommender():
-    def __init__(self):
+class house_recommender:
+    def __init__(self, rankNum):
         self.train_data = None
         self.user_id = None
         self.item_id = None
         self.cooccurence_matrix = None
-        self.houses_dict = None
-        self.rev_houses_dict = None
-        self.item_similarity_recommendations = None
+        self.rankNum = rankNum
 
     # we get unique items corresponding to a given user
     def get_user_items(self, user):
@@ -82,7 +80,7 @@ class house_recommender():
 
         rank = 1
         for i in range(0, len(sort_index)):
-            if ~numpy.isnan(sort_index[i][0]) and all_houses[sort_index[i][1]] not in user_houses and rank <= 10:
+            if ~numpy.isnan(sort_index[i][0]) and all_houses[sort_index[i][1]] not in user_houses and rank <= self.rankNum:
                 df.loc[len(df)] = [user, all_houses[sort_index[i][1]], sort_index[i][0], rank]
                 rank = rank + 1
 
@@ -90,7 +88,7 @@ class house_recommender():
             print("None")
             return -1
         else:
-            return df
+            return df[df['score'] > 0]
 
     def create(self, train_data, user_id, item_id):
         self.train_data = train_data
@@ -116,8 +114,6 @@ class house_recommender():
 
     def similar_items(self, item_list):
 
-        user_houses = item_list
-
         # Get all unique items (houses) in the training data
         all_houses = self.get_all_items_train_data()
 
@@ -125,10 +121,10 @@ class house_recommender():
 
         # Construct item cooccurence matrix of size
         # len(user_houses) X len(houses)
-        cooccurence_matrix = self.construct_cooccurence_matrix(user_houses, all_houses)
+        cooccurence_matrix = self.construct_cooccurence_matrix(item_list, all_houses)
 
         # Use the cooccurence matrix to make recommendations
-        user = ""
-        df_recommendations = self.generate_top_recommendations(user, cooccurence_matrix, all_houses, user_houses)
+        user = "0"
+        df_recommendations = self.generate_top_recommendations(user, cooccurence_matrix, all_houses, item_list)
 
         return df_recommendations
