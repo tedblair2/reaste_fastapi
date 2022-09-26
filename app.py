@@ -44,7 +44,10 @@ def collaborative(userid: str = Form()):
         results.extend(recommendations)
 
     results = list(dict.fromkeys(results))
-    results_random = random.sample(results, 10)
+    if len(results) < 10:
+        results_random = results
+    else:
+        results_random = random.sample(results, 10)
 
     # using collaborative filtering to provide personalized recommendations
     history = Content.get_history()
