@@ -44,7 +44,7 @@ def collaborative(userid: str = Form()):
         results.extend(recommendations)
 
     results = list(dict.fromkeys(results))
-    if len(results) < 10:
+    if len(results) < 12:
         results_random = results
     else:
         results_random = random.sample(results, 10)
